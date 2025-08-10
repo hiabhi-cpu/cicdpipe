@@ -1,0 +1,6 @@
+github.com/hiabhi-cpu/gitwebhook v0.0.0-20250801175543-18c4917610ea h1:f+112VAaAB/oxo1k6rhzrvhxU+7fUS9xslMVeCutfSA=
+github.com/hiabhi-cpu/gitwebhook v0.0.0-20250801175543-18c4917610ea/go.mod h1:gZRoVndtKGDX5NJF2SSEkZ1YkFSwtK/OMlH+jS5oNqI=
+github.com/hiabhi-cpu/gitwebhook v0.0.0-20250809073244-8c5f8bd04695 h1:Zt2F9K33LYSkhHMpX7mYE18kv2JKaXHJqYAGI7Ti1bA=
+github.com/hiabhi-cpu/gitwebhook v0.0.0-20250809073244-8c5f8bd04695/go.mod h1:gZRoVndtKGDX5NJF2SSEkZ1YkFSwtK/OMlH+jS5oNqI=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
