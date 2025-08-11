@@ -22,7 +22,6 @@ func main() {
 	fmt.Println("Hello")
 	var err error
 	logFile, err = os.OpenFile("mainLogs.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-
 	if err != nil {
 		fmt.Println("Failed to open log file:", err)
 		return
@@ -35,22 +34,18 @@ func main() {
 	}
 	user_PAT := os.Getenv("GIT_PAT")
 	gitRepo := "github.com/hiabhi-cpu/webHookTry"
-	err = gitlib.GetOrCreateWebhook(gitRepo, user_PAT)
+	rev_url := os.Getenv("REV_URL")
+	err = gitlib.GetOrCreateWebhook(gitRepo, user_PAT, rev_url)
 
 	if err != nil {
 		fmt.Println("Failed to Get or Create Webhook", err)
 		return
 	}
-	// Start ngrok
-	ngrokCmd = exec.Command("ngrok", "http", "--url=raccoon-model-reasonably.ngrok-free.app", "8080") // <-- fixed wrong flag
-	ngrokCmd.Stdout = logFile
-	ngrokCmd.Stderr = logFile
 
-	if err := ngrokCmd.Start(); err != nil {
-		logFile.WriteString(fmt.Sprintf("[%s] Failed to start ngrok: %v\n", time.Now().Format(time.RFC3339), err))
+	if err = runGrokCommand(); err != nil {
+		fmt.Println(err)
 		return
 	}
-	logFile.WriteString(fmt.Sprintf("[%s] ngrok started with PID: %d\n", time.Now().Format(time.RFC3339), ngrokCmd.Process.Pid))
 
 	go handleShutdown()
 
@@ -97,4 +92,17 @@ func getWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	logFile.WriteString(fmt.Sprintf("[%s] Received GET request\n", time.Now().Format(time.RFC3339)))
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("GET Webhook created"))
+}
+
+func runGrokCommand() error {
+	// Start ngrok
+	ngrokCmd = exec.Command("ngrok", "http", "--url=raccoon-model-reasonably.ngrok-free.app", "8080") // <-- fixed wrong flag
+	ngrokCmd.Stdout = logFile
+	ngrokCmd.Stderr = logFile
+	if err := ngrokCmd.Start(); err != nil {
+		logFile.WriteString(fmt.Sprintf("[%s] Failed to start ngrok: %v\n", time.Now().Format(time.RFC3339), err))
+		return err
+	}
+	logFile.WriteString(fmt.Sprintf("[%s] ngrok started with PID: %d\n", time.Now().Format(time.RFC3339), ngrokCmd.Process.Pid))
+	return nil
 }
