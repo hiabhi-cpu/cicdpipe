@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	jsonrequests "github.com/hiabhi-cpu/cicdpipe/jsonRequests"
 	gitlib "github.com/hiabhi-cpu/gitwebhook/gitLib"
 	"github.com/joho/godotenv"
 )
@@ -33,7 +35,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	user_PAT := os.Getenv("GIT_PAT")
-	gitRepo := "github.com/hiabhi-cpu/webHookTry"
+	gitRepo := os.Getenv("GIT_REPO")
 	rev_url := os.Getenv("REV_URL")
 	err = gitlib.GetOrCreateWebhook(gitRepo, user_PAT, rev_url)
 
@@ -83,6 +85,24 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 	logFile.WriteString(fmt.Sprintf("[%s] Received POST request\n", time.Now().Format(time.RFC3339)))
 	fmt.Println("Received POST request")
 	fmt.Println(string(body))
+
+	var newWebhook jsonrequests.NewHookJson
+	var newCommit jsonrequests.NewCommitJson
+
+	if err := json.Unmarshal(body, &newWebhook); err != nil {
+		fmt.Println("No new webhook created")
+	}
+
+	if err := json.Unmarshal(body, &newCommit); err != nil {
+		fmt.Println("No new commit")
+	}
+
+	if newWebhook.Zen != "" {
+		fmt.Println(newWebhook)
+	}
+	if newCommit.Ref != "" {
+		fmt.Println(newCommit)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Webhook created"))
