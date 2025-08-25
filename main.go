@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -12,7 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	jsonrequests "github.com/hiabhi-cpu/cicdpipe/jsonRequests"
+	checkversions "github.com/hiabhi-cpu/cicdpipe/checkVersions"
+	gittolocal "github.com/hiabhi-cpu/cicdpipe/gitToLocal"
 	gitlib "github.com/hiabhi-cpu/gitwebhook/gitLib"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +21,15 @@ var logFile *os.File
 var ngrokCmd *exec.Cmd
 
 func main() {
+	if checkversions.CheckGitVersion() != nil {
+		panic("No git in the local system install git first")
+	}
+	if checkversions.CheckDockerVersion() != nil {
+		panic("Install docker and check it's working")
+	}
+	if checkversions.CheckNGrokVersion() != nil {
+		panic("Install docker and check it's working")
+	}
 	fmt.Println("Hello")
 	var err error
 	logFile, err = os.OpenFile("mainLogs.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -86,23 +95,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received POST request")
 	fmt.Println(string(body))
 
-	var newWebhook jsonrequests.NewHookJson
-	var newCommit jsonrequests.NewCommitJson
-
-	if err := json.Unmarshal(body, &newWebhook); err != nil {
-		fmt.Println("No new webhook created")
-	}
-
-	if err := json.Unmarshal(body, &newCommit); err != nil {
-		fmt.Println("No new commit")
-	}
-
-	if newWebhook.Zen != "" {
-		fmt.Println(newWebhook)
-	}
-	if newCommit.Ref != "" {
-		fmt.Println(newCommit)
-	}
+	go gittolocal.GetGitToLocal(body)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Webhook created"))
