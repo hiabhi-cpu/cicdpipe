@@ -2,3 +2,5 @@ cicdpipe
 .env
 ngrok.log
 mainLogs.log
+localGitData.json
+webHookTry

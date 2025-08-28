@@ -46,6 +46,7 @@ func main() {
 	user_PAT := os.Getenv("GIT_PAT")
 	gitRepo := os.Getenv("GIT_REPO")
 	rev_url := os.Getenv("REV_URL")
+	// fmt.Println(gitRepo)
 	err = gitlib.GetOrCreateWebhook(gitRepo, user_PAT, rev_url)
 
 	if err != nil {
@@ -93,7 +94,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logFile.WriteString(fmt.Sprintf("[%s] Received POST request\n", time.Now().Format(time.RFC3339)))
 	fmt.Println("Received POST request")
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	go gittolocal.GetGitToLocal(body)
 
@@ -102,6 +103,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getWebhookHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(os.Getenv("GIT_REPO"))
 	logFile.WriteString(fmt.Sprintf("[%s] Received GET request\n", time.Now().Format(time.RFC3339)))
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("GET Webhook created"))
