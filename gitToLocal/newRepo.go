@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/hiabhi-cpu/cicdpipe/mailing"
 )
 
 var logFile *os.File
@@ -29,7 +31,7 @@ func NewRepo() {
 	AddFiletoGitIgnore(gitRepo)
 	logFile.WriteString("Clonging repo" + string(out))
 	fmt.Println("Cloning the repo to local")
-
+	mailing.Mailing("New Webhook", "A new webhook has been created for "+gitRepo+" repository and cloned.", []string{})
 }
 
 func checkForLocalGitData() {

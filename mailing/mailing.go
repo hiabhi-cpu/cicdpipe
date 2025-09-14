@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Mailing() {
+func Mailing(subject, body string, filePath []string) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -17,7 +17,6 @@ func Mailing() {
 	from := os.Getenv("GMAIL")
 	password := os.Getenv("MAIL_PASS") // 16-character app password
 	tomail := strings.Split(os.Getenv("TO_MAIL"), ",")
-	body := "Hi Alice, please find the report attached."
-	subject := "Report with Attachment"
-	mailrepo.Mail(from, tomail, []string{}, password, subject, body, []string{})
+
+	mailrepo.Mail(from, tomail, []string{}, password, subject, body, filePath)
 }
