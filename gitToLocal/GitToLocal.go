@@ -22,9 +22,10 @@ func GetGitToLocal(body []byte) {
 
 	if newWebhook.Zen != "" {
 		NewRepo()
-		fmt.Println(newWebhook.Zen)
+		// fmt.Println(newWebhook.Zen)
 	}
 	if newCommit.Ref != "" {
-		fmt.Println(newCommit)
+		NewCommit()
+		// fmt.Println(newCommit)
 	}
 }
