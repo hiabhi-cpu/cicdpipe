@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/hiabhi-cpu/cicdpipe/mailing"
 )
@@ -20,12 +21,6 @@ func NewCommit() {
 	defer logFile.Close()
 	patternSplit := strings.Split(gitRepo, "/")
 	folderName := patternSplit[len(patternSplit)-1]
-	// out, err :=exec.Command("cd", folderName).Output()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	fmt.Println("Error in Pulling")
-	// 	return
-	// }
 
 	cmd := exec.Command("git", "pull")
 	cmd.Dir = "./" + folderName
@@ -33,10 +28,12 @@ func NewCommit() {
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Error in Pulling")
+		logFile.WriteString(fmt.Sprintf("[%s] Failed to pull: %s\n", time.Now().Format(time.RFC3339), err))
 		return
 	}
 	AddFiletoGitIgnore(gitRepo)
-	logFile.WriteString("Pulling repo" + string(out))
+	// logFile.WriteString("Pulling repo" + string(out))
+	logFile.WriteString(fmt.Sprintf("[%s] Pulling repo: %v\n", time.Now().Format(time.RFC3339), string(out)))
 	fmt.Println("Pulling new commit repo to local")
 	mailing.Mailing("New Commit", "A new commit has been created for "+gitRepo+" repository and pulled.", []string{})
 }

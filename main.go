@@ -94,7 +94,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logFile.WriteString(fmt.Sprintf("[%s] Received POST request\n", time.Now().Format(time.RFC3339)))
 	fmt.Println("Received POST request")
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	go gittolocal.GetGitToLocal(body)
 
