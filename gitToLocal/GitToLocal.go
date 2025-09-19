@@ -3,6 +3,7 @@ package gittolocal
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	jsonrequests "github.com/hiabhi-cpu/cicdpipe/jsonRequests"
 )
@@ -28,4 +29,16 @@ func GetGitToLocal(body []byte) {
 		NewCommit()
 		// fmt.Println(newCommit)
 	}
+}
+
+func createLogFile() {
+	file, err := os.Create(FILENAME)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+
+	
 }

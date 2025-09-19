@@ -12,12 +12,13 @@ import (
 )
 
 var logFile *os.File
+var gitRepo string
 
 const FILENAME = "localGitData.json"
 
 func NewRepo() {
 
-	gitRepo := os.Getenv("GIT_REPO")
+	gitRepo = os.Getenv("GIT_REPO")
 
 	logFile, err := os.OpenFile("mainLogs.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -26,14 +27,16 @@ func NewRepo() {
 	}
 	defer logFile.Close()
 
+	checkForLocalGitData(gitRepo)
+	AddFiletoGitIgnore(gitRepo)
+
 	out, err := exec.Command("git", "clone", "https://"+gitRepo).Output()
 	if err != nil {
 		fmt.Println("Error in Cloning")
 		logFile.WriteString(fmt.Sprintf("[%s] Failed to clone: %v\n", time.Now().Format(time.RFC3339), err))
 		return
 	}
-	checkForLocalGitData(gitRepo)
-	AddFiletoGitIgnore(gitRepo)
+
 	// logFile.WriteString("Clonging repo" + string(out))
 	logFile.WriteString(fmt.Sprintf("[%s] Clonging repo: %s\n", time.Now().Format(time.RFC3339), string(out)))
 	fmt.Println("Cloning the repo to local")
@@ -42,12 +45,31 @@ func NewRepo() {
 
 func checkForLocalGitData(gitRepo string) {
 
+	var existing jsonrequests.LocalJson
+
+	// Step 1: Check if file exists
+	if _, err := os.Stat(FILENAME); err == nil {
+		// File exists → read and unmarshal
+		data, err := os.ReadFile(FILENAME)
+		if err == nil && len(data) > 0 {
+			_ = json.Unmarshal(data, &existing)
+		}
+	}
+
+	// Step 2: Compare old vs new
+	if existing.Git_Repo == gitRepo {
+		fmt.Println("No changes, skipping write.")
+		return
+	}
+
+	// Step 3: Write new data (overwrite file)
 	file, err := os.Create(FILENAME)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return
 	}
 	defer file.Close()
+
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(jsonrequests.LocalJson{Git_Repo: gitRepo}); err != nil {
@@ -55,5 +77,5 @@ func checkForLocalGitData(gitRepo string) {
 		return
 	}
 
-	fmt.Println("Data written to log.json successfully!")
+	fmt.Println("JSON data updated in", FILENAME)
 }
