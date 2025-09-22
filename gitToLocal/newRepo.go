@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	jsonrequests "github.com/hiabhi-cpu/cicdpipe/jsonRequests"
@@ -13,6 +14,7 @@ import (
 
 var logFile *os.File
 var gitRepo string
+var oldRepo string
 
 const FILENAME = "localGitData.json"
 
@@ -69,7 +71,7 @@ func checkForLocalGitData(gitRepo string) {
 		return
 	}
 	defer file.Close()
-
+	oldRepo = getFileName(existing.Git_Repo)
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(jsonrequests.LocalJson{Git_Repo: gitRepo}); err != nil {
@@ -78,4 +80,25 @@ func checkForLocalGitData(gitRepo string) {
 	}
 
 	fmt.Println("JSON data updated in", FILENAME)
+	removeOldRepo(oldRepo)
+}
+
+func removeOldRepo(dir string) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		fmt.Println("Directory does not exist:", dir)
+		return
+	}
+
+	if err := os.RemoveAll(dir); err != nil {
+		fmt.Println("Error removing directory:", err)
+		return
+	}
+
+	fmt.Println("Directory", dir, "removed successfully")
+}
+
+func getFileName(existing string) string {
+
+	str := strings.Split(existing, "/")
+	return str[len(str)-1]
 }
