@@ -81,6 +81,7 @@ func checkForLocalGitData(gitRepo string) {
 
 	fmt.Println("JSON data updated in", FILENAME)
 	removeOldRepo(oldRepo)
+	RemoveOldRepoFromGitIgnore(oldRepo)
 }
 
 func removeOldRepo(dir string) {

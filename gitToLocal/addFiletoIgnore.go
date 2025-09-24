@@ -7,8 +7,10 @@ import (
 	"strings"
 )
 
+const fileName = ".gitignore"
+
 func AddFiletoGitIgnore(gitRepo string) error {
-	fileName := ".gitignore"
+
 	patternSplit := strings.Split(gitRepo, "/")
 	pattern := patternSplit[len(patternSplit)-1]
 	fmt.Println(pattern)
@@ -33,4 +35,28 @@ func AddFiletoGitIgnore(gitRepo string) error {
 	}
 	fmt.Println("Added pattern to .gitignore:", pattern)
 	return nil
+}
+
+func RemoveOldRepoFromGitIgnore(gitrepo string) error {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		// Keep all lines except the one that matches target
+		if strings.TrimSpace(line) != gitrepo && len(strings.TrimSpace(line)) != 0 {
+			lines = append(lines, line)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	// Rewrite the file without the target line
+	return os.WriteFile(fileName, []byte(strings.Join(lines, "\n")+"\n"), 0644)
 }
