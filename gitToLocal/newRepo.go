@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hiabhi-cpu/cicdpipe/dockerbuild"
 	jsonrequests "github.com/hiabhi-cpu/cicdpipe/jsonRequests"
 	"github.com/hiabhi-cpu/cicdpipe/mailing"
 )
@@ -42,6 +43,7 @@ func NewRepo() {
 	// logFile.WriteString("Clonging repo" + string(out))
 	logFile.WriteString(fmt.Sprintf("[%s] Clonging repo: %s\n", time.Now().Format(time.RFC3339), string(out)))
 	fmt.Println("Cloning the repo to local")
+	dockerbuild.CheckDockerInRepo()
 	mailing.Mailing("New Webhook", "A new webhook has been created for "+gitRepo+" repository and cloned.", []string{})
 }
 
@@ -97,7 +99,6 @@ func removeOldRepo(dir string) {
 
 	fmt.Println("Directory", dir, "removed successfully")
 }
-
 func getFileName(existing string) string {
 
 	str := strings.Split(existing, "/")

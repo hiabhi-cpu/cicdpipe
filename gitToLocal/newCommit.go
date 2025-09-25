@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hiabhi-cpu/cicdpipe/dockerbuild"
 	"github.com/hiabhi-cpu/cicdpipe/mailing"
 )
 
@@ -35,5 +36,6 @@ func NewCommit() {
 	// logFile.WriteString("Pulling repo" + string(out))
 	logFile.WriteString(fmt.Sprintf("[%s] Pulling repo: %v\n", time.Now().Format(time.RFC3339), string(out)))
 	fmt.Println("Pulling new commit repo to local")
+	dockerbuild.CheckDockerInRepo()
 	mailing.Mailing("New Commit", "A new commit has been created for "+gitRepo+" repository and pulled.", []string{})
 }
